@@ -217,16 +217,11 @@ On peut aussi réaliser la même chose avec une boucle FOREACH :
 Si on souhaite modifier un enregistrement dans la base :
 
 ```php
-+----------------------------------------------------------------------+
-| // on défini notre requête                                           |
-|                                                                      |
-| \$requete = \$connexion-\>prepare(\"UPDATE livre SET                 |
-| titre=\'nouveautitre\' WHERE id_livre=43\");                         |
-|                                                                      |
-| // on exécute la requête                                             |
-|                                                                      |
-| \$requete-\>execute();                                               |
-+======================================================================+
+
+// on défini notre requête    
+$requete = $connexion->prepare("UPDATE livre SET titre='nouveautitre' WHERE id_livre=43");     
+ // on exécute la requête     
+$requete->execute(); 
 ````
 
 Ici le titre du livre sera changé en "nouveau titre" pour le livre
