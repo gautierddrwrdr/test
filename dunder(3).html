@@ -1,0 +1,237 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dunder</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+  <link rel="stylesheet" href="stylbis.css" />
+
+</head>
+
+
+
+
+
+<body class="stackedit">
+  <div class="stackedit__html"><h2 id="php--requêtes-sql">PHP / Requêtes SQL</h2>
+<h1>Connexion à la base de données</h1>
+<p>Pour pouvoir manipuler nos bases de données MySQL en PHP (sans passer par phpMyAdmin), nous allons déjà devoir nous connecter à MySQL.</p>
+<p>Pour cela, le PHP met à notre disposition deux API (Application Programming Interface) :</p>
+<ul>
+<li>L’extension MySQLi ;</li>
+<li>L’extension PDO (PHP Data Objects).</li>
+</ul>
+<p>Il existe notamment une différence notable entre ces deux API : l’extension MySQLi ne va fonctionner qu’avec les bases de données MySQL tandis que PDO va fonctionner avec 12 systèmes de bases de données différents.</p>
+<blockquote>
+<p>On va donc privilégier l’utilisation de PDO.</p>
+</blockquote>
+<p>Pour se connecter à une base de données on va utiliser la commande suivante :</p>
+<pre class=" language-php"><code class="prism  language-php">
+<span class="token variable">$connexion</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PDO</span><span class="token punctuation">(</span>\'mysql<span class="token punctuation">:</span>host<span class="token operator">=</span>localhost<span class="token punctuation">;</span> dbname<span class="token operator">=</span>bibliotheque<span class="token punctuation">;</span> charset<span class="token operator">=</span>utf8\'<span class="token punctuation">,</span> \'root\'<span class="token punctuation">,</span> \'rootpassword\'<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+</code></pre>
+<button class="copy-button">Copier</button>
+<script>
+document.querySelectorAll(".copy-button").forEach(button => {
+    button.addEventListener("click", () => {
+        const code = button.previousElementSibling.textContent;
+        navigator.clipboard.writeText(code);
+        button.textContent = "Copié !";
+        setTimeout(() => button.textContent = "Copier", 1500);
+    });
+});
+</script>
+<p>Ici on indique le serveur MySQL (dans notre cas notre propre ordinateur donc localhost, dans la réalité on utilisera plus une adresse IP), le nom de la base de données et les informations d’authentification login et mot de passe (de base le compte root n’a pas de mot de passe).</p>
+<p>Afin de sécuriser l’accès à notre base on peut modifier le mot de passe root, pour cela dans phpMyAdmin on clique sur la roue crantée puis</p>
+<p>“Comptes utilisateurs” :</p>
+<p><img src="images/fedb92de5b46b58232ae3d30a1000b6104156778.png" alt="">{width=“6.177083333333333in”</p>
+<p>height=“0.9115398075240595in”}</p>
+<p>On clique sur l’utilisateur root puis “Change password” :</p>
+<p><img src="images/1985d4e6adebf1c70057140187b78eab0de420da.png" alt="">{width=“6.229166666666667in”</p>
+<p>height=“1.2458333333333333in”}</p>
+<h3 id="comment-lancer-une-requête"><strong>Comment lancer une requête</strong></h3>
+<p>Une fois connecté à la base de données, notre but sera d’exécuter des</p>
+<p>requêtes afin d’afficher du contenu ou alors d’insérer de nouveaux</p>
+<p>enregistrements dans notre base.</p>
+<h3 id="insertion"><strong>INSERTION</strong></h3>
+<p>En reprenant la base de données “bibliothèque” utilisé dans les</p>
+<p>précédents cours, on peut y intégrer de nouveaux enregistrements en</p>
+<p>utilisant le code ci-dessous :</p>
+<p>±------------------------------------------------------------------------+</p>
+<p>| // on définit les variables qu’on veut intégrer |</p>
+<p>| |</p>
+<p>| $titre = “LIVRE3”; |</p>
+<p>| |</p>
+<p>| $annee = 1879; |</p>
+<p>| |</p>
+<p>| $nbpages = 59; |</p>
+<p>| |</p>
+<p>| $langue = “UK”; |</p>
+<p>| |</p>
+<p>| $idauteur = 2; |</p>
+<p>| |</p>
+<p>| // on définit notre requête |</p>
+<p>| |</p>
+<p>| $requete = $connexion-&gt;prepare("INSERT INTO livre |</p>
+<p>| (titre,annee,nombre_page,langue,id_auteur) VALUES (?,?,?,?,?)"); |</p>
+<p>| |</p>
+<p>| // on exécute la requête |</p>
+<p>| |</p>
+<p>| $requete-&gt;execute([$titre,$annee,$nbpages,$langue,$idauteur]); |</p>
+<p>+=========================================================================+</p>
+<p>Ci-dessous une autre méthode :</p>
+<p>±---------------------------------------------------------------------+</p>
+<p>| // on définit notre requête |</p>
+<p>| |</p>
+<p>| $requete = $connexion-&gt;prepare("INSERT INTO livre |</p>
+<p>| (titre,annee,nombre_page,langue,id_auteur) VALUES (:titre, :annee, |</p>
+<p>| :nbpages, :langue, :idauteur)"); |</p>
+<p>| |</p>
+<p>| // on exécute la requête |</p>
+<p>| |</p>
+<p>| $requete-&gt;execute(array( |</p>
+<p>| |</p>
+<p>| “:titre”=&gt;$titre, |</p>
+<p>| |</p>
+<p>| “:annee”=&gt;$annee, |</p>
+<p>| |</p>
+<p>| “:nbpages”=&gt;$nbpages, |</p>
+<p>| |</p>
+<p>| “:langue”=&gt;$langue, |</p>
+<p>| |</p>
+<p>| “:idauteur”=&gt;$idauteur) |</p>
+<p>| |</p>
+<p>| ); |</p>
+<p>+======================================================================+</p>
+<p>On peut vérifier via phpMyAdmin si le LIVRE3 à bien été ajouté dans la</p>
+<p>table “livre” de la base de données “bibliothèque”.</p>
+<h3 id="visualisation"><strong>VISUALISATION</strong></h3>
+<p>Maintenant qu’on est capable d’intégrer des données via le PHP il va</p>
+<p>valoir apprendre à les récupérer et les mettre en page.</p>
+<p>Dans notre exemple on décide d’afficher le titre, l’année, le nombre de</p>
+<p>pages et la langue, le tout séparé par des espace et un retour à la</p>
+<p>ligne entre chaque livre :</p>
+<p>±---------------------------------------------------------------------+</p>
+<p>| // on définit notre requête et on range dans une variable le |</p>
+<p>| résultat de cette requête |</p>
+<p>| |</p>
+<p>| $requete2 = “SELECT * FROM livre”; |</p>
+<p>| |</p>
+<p>| $resultat2 = $connexion-&gt;query($requete2); |</p>
+<p>| |</p>
+<p>| // tant que la requête nous retourne des données on les met en forme |</p>
+<p>| et on les affiche |</p>
+<p>| |</p>
+<p>| while ($ligne = $resultat2-&gt;fetch()) { |</p>
+<p>| |</p>
+<p>| echo $ligne[‘titre’]." “.$ligne[‘annee’].” |</p>
+<p>| “.$ligne[‘nombre_page’].” |</p>
+<p>| “.$ligne[‘langue’].”&lt;br&gt;"; |</p>
+<p>| |</p>
+<p>| } |</p>
+<p>+======================================================================+</p>
+<p>Ce qui nous donne :</p>
+<p><img src="images/a3d795902d961f6c05532bbdd1995633a43cebfa.png" alt="">{width=“5.0in”</p>
+<p>height=“1.108390201224847in”}</p>
+<p>Afin d’améliorer la mise en page on peut aussi afficher les données</p>
+<p>directement dans un tableau, ce qui nous donne pour la mise en place de</p>
+<p>la structure du tableau :</p>
+<p>±---------------------------------------------------------------------+</p>
+<p>| // on crée un tableau via la balise HTML |</p>
+<p>| |</p>
+<p>| echo “&lt;table border=1&gt;”; |</p>
+<p>| |</p>
+<p>| echo "&lt;tr&gt; |</p>
+<p>| |</p>
+<p>| &lt;th width=‘100px’&gt;TITRE&lt;/th&gt; |</p>
+<p>| |</p>
+<p>| &lt;th&gt;ANNEE&lt;/th&gt; |</p>
+<p>| |</p>
+<p>| &lt;th&gt;NB PAGES&lt;/th&gt; |</p>
+<p>| |</p>
+<p>| &lt;th&gt;LANGUE&lt;/th&gt; |</p>
+<p>| |</p>
+<p>| &lt;/tr&gt;"; |</p>
+<p>+======================================================================+</p>
+<p>Puis ensuite on ajoute la boucle pour afficher les données et y a mettre</p>
+<p>en forme via les balises HTML :</p>
+<p>±---------------------------------------------------------------------+</p>
+<p>| // tant que la requête nous retourne des données on les met en forme |</p>
+<p>| et on les affiche |</p>
+<p>| |</p>
+<p>| while ($ligne = $resultat2-&gt;fetch()) { |</p>
+<p>| |</p>
+<p>| // on met en forme les données grâce aux balises &lt;td&gt; et &lt;tr&gt; |</p>
+<p>| |</p>
+<p>| echo “&lt;tr&gt;”; |</p>
+<p>| |</p>
+<p>| echo “&lt;td width=‘100px’&gt;” . $ligne[‘titre’] . |</p>
+<p>| “&lt;/td&gt;”; |</p>
+<p>| |</p>
+<p>| echo “&lt;td&gt;”.$ligne[‘annee’] . “&lt;/td&gt;”; |</p>
+<p>| |</p>
+<p>| echo “&lt;td&gt;”.$ligne[‘nombre_page’] . “&lt;/td&gt;”; |</p>
+<p>| |</p>
+<p>| echo “&lt;td&gt;”.$ligne[‘langue’] . “&lt;/td&gt;”; |</p>
+<p>| |</p>
+<p>| echo “&lt;/tr&gt;”; |</p>
+<p>| |</p>
+<p>| }\ |</p>
+<p>| echo “&lt;/table&gt;”; |</p>
+<p>+======================================================================+</p>
+<p>Ce qui nous donne :</p>
+<p><img src="images/cc9dfde81bfd8d6dc188334504640035666b88fb.png" alt="">{width=“4.229166666666667in”</p>
+<p>height=“1.5416666666666667in”}</p>
+<p>On peut aussi réaliser la même chose avec une boucle FOREACH :</p>
+<p>±---------------------------------------------------------------------+</p>
+<p>| foreach ($resultat2 as $ligne) { |</p>
+<p>| |</p>
+<p>| echo “&lt;tr&gt;”; |</p>
+<p>| |</p>
+<p>| echo “&lt;td&gt;”.$ligne[‘titre’] . “&lt;/td&gt;”; |</p>
+<p>| |</p>
+<p>| print “&lt;td&gt;”.$ligne[‘annee’] . “&lt;/td&gt;”; |</p>
+<p>| |</p>
+<p>| print “&lt;td&gt;”.$ligne[‘nombre_page’] . “&lt;/td&gt;”; |</p>
+<p>| |</p>
+<p>| echo “&lt;/tr&gt;”; |</p>
+<p>| |</p>
+<p>| } |</p>
+<p>+======================================================================+</p>
+<h3 id="mise-a-jour"><strong>MISE A JOUR</strong></h3>
+<p>Si on souhaite modifier un enregistrement dans la base :</p>
+<pre class=" language-php"><code class="prism  language-php">
+<span class="token comment">// on défini notre requête</span>
+\<span class="token variable">$requete</span> <span class="token operator">=</span> \<span class="token variable">$connexion</span><span class="token operator">-</span>\<span class="token operator">&gt;</span><span class="token function">prepare</span><span class="token punctuation">(</span>\"<span class="token constant">UPDATE</span> livre <span class="token constant">SET</span>
+
+titre<span class="token operator">=</span>\'nouveautitre\' <span class="token constant">WHERE</span> id_livre<span class="token operator">=</span><span class="token number">43</span>\"<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+
+<span class="token comment">//  on exécute la requête</span>
+\<span class="token variable">$requete</span><span class="token operator">-</span>\<span class="token operator">&gt;</span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+
+</code></pre>
+<p>Ici le titre du livre sera changé en “nouveau titre” pour le livre</p>
+<p>portant l’id numéro 43</p>
+<p><img src="images/c460164be4a3082c86e13e60a0e707c31f1b1a78.png" alt="">{width=“6.239583333333333in”</p>
+<p>height=“0.28598097112860893in”}</p>
+<h3 id="exercice"><strong>Exercice</strong></h3>
+<p>Nous réutiliserons la table auteur que nous avions créé précédemment,</p>
+<p>pour rappel :</p>
+<p><img src="images/c444efdcd497876b199933779d0c4050d1a2f5fc.png" alt="">{width=“1.875in”</p>
+<p>height=“1.9166666666666667in”}</p>
+<p>Le but ici est de créer une page PHP qui va afficher la liste des</p>
+<p>auteurs sous forme de tableau. Cette liste sera récupérée directement de</p>
+<p>la base de table auteur.\</p>
+<p>Exemple de réalisation :</p>
+<p><img src="images/a320913a66f81a9edc9ec1ee4620b8b9a5bfeb63.png" alt="">{width=“5.6875in”</p>
+<p>height=“2.357942913385827in”}</p>
+<p>Une fois que nos auteurs sont listés, nous allons ajouter en dessous de</p>
+<p>cette liste un formulaire qui nous permettra d’en ajouter de nouveaux :</p>
+<p><img src="images/60e08513e0d841a98f81ed2c2b0dea33566339ff.png" alt="">{width=“5.739583333333333in”</p>
+<p>height=“2.283875765529309in”}</p>
+</div>
+</body>
+
+</html>
