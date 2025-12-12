@@ -22,7 +22,7 @@ Pour se connecter à une base de données on va utiliser la commande
 suivante :
 
 ```php
-$connexion = new PDO(\'mysql:host=localhost; dbname=bibliotheque;charset=utf8\', \'root\', \'rootpassword\');
+$connexion = new PDO('mysql:host=localhost; dbname=bibliotheque;charset=utf8', 'root', 'rootpassword');
 ```
 Ici on indique le serveur MySQL (dans notre cas notre propre ordinateur
 donc localhost, dans la réalité on utilisera plus une adresse IP), le
